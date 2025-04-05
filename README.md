@@ -15,8 +15,7 @@
 ![image](https://raw.githubusercontent.com/wanjiaXG/Image-Hosting-Service/main/youtube2mp3-02.png)
 ![image](https://raw.githubusercontent.com/wanjiaXG/Image-Hosting-Service/main/youtube2mp3-03.png)
 
-## 3. 打开youtube2mp3，粘贴刚刚复制的cookie到对应的文本框中，之后复制你要下载的视频到地址栏后，点击开始下载即可
-youtube2mp3链接：https://github.com/wanjiaXG/youtube2mp3/releases
+## 3. 打开youtube2mp3，粘贴刚刚复制的cookie到对应的文本框中，之后复制你要下载的视频到地址栏后，点击开始下载即可，youtube2mp3链接：https://github.com/wanjiaXG/youtube2mp3/releases
 ![image](https://raw.githubusercontent.com/wanjiaXG/Image-Hosting-Service/main/youtube2mp3-04.png)
 ![image](https://raw.githubusercontent.com/wanjiaXG/Image-Hosting-Service/main/youtube2mp3-05.png)
    
