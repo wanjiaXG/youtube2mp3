@@ -1,6 +1,6 @@
 帮朋友抓油管音频写的，本来写了个bat，但想想还是写个GUI算了
 
-工具使用了ffmpeg和yt-dlp配合命令行实现
+工具使用了[ffmpeg](https://github.com/FFmpeg/FFmpeg)和[yt-dlp](https://github.com/yt-dlp/yt-dlp)配合命令行实现
 可直接转换为osu的Ranked标准的192k-mp3音频
 
 需要提供cookie
