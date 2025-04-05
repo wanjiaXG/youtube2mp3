@@ -7,8 +7,7 @@
 可使用"Chrome浏览器"并安装"Get cookies.txt LOCALLY"插件后获取
 
 ### 使用方法
-## 1. 先去Chrome浏览器获取并安装Cookie的插件，点击链接后根据提示安装即可
-插件链接: https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
+## 1. 先去Chrome浏览器获取并安装Cookie的插件，点击链接后根据提示安装即可 插件链接: https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc
 ![image](https://raw.githubusercontent.com/wanjiaXG/Image-Hosting-Service/main/youtube2mp3-01.png)
 
 ## 2. 安装之后打开任意油管页面，油管账号最好是登录状态，然后点击插件，选择Copy
