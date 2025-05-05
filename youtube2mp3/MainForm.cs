@@ -28,6 +28,7 @@ namespace youtube2mp3
 
         private static string CookiePath = Path.Combine(RootFolder, "cookie.txt");
 
+        private static object locked = new object();
 
         public MainForm()
         {
@@ -36,37 +37,135 @@ namespace youtube2mp3
 
         protected override void OnLoad(EventArgs e)
         {
+            new Thread(Init).Start();
+        }
+
+        private void Init()
+        {
+            this.Invoke((MethodInvoker)(() =>
+            {
+                DownloadBtn.Text = "初始化中";
+                DownloadBtn.Enabled = false;
+            }));
+
+            Kill();
             Directory.CreateDirectory(RootFolder);
             Directory.CreateDirectory(OutputFolder);
             CleanRootFolder();
             CleanOutputFolder();
             File.WriteAllBytes(ffmpegPath, Resources.ffmpeg);
             File.WriteAllBytes(ytdlpPath, Resources.yt_dlp);
+
+            this.Invoke((MethodInvoker)(() =>
+            {
+                DownloadBtn.Text = "开始下载";
+                DownloadBtn.Enabled = true;
+            }));
+        }
+
+        private void Kill()
+        {
+            Process process = Process.GetCurrentProcess();
+            foreach(var item in Process.GetProcesses())
+            {
+                try
+                {
+                    Console.WriteLine(item.MainModule.FileName);
+                    if(item.Id != process.Id && item.MainModule.FileName.Contains("youtube2mp3"))
+                    {
+                        item.Kill();
+                    }
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         private void CleanRootFolder()
         {
-
-            foreach(var item in new DirectoryInfo(RootFolder).GetFiles("temp*"))
+            for (int i = 0; i <= 10; i++)
             {
-                item.Delete();
+                try
+                {
+                    foreach (var item in new DirectoryInfo(RootFolder).GetFiles("temp*"))
+                    {
+                        item.Delete();
+                    }
+                    break;
+                }
+                catch
+                {
+                    Thread.Sleep(1000);
+                }
             }
+
             File.Delete(CookiePath);
         }
 
         private void CleanOutputFolder()
         {
-            foreach (var item in new DirectoryInfo(OutputFolder).GetFiles())
+            for(int i = 0; i <= 10; i++)
             {
-                item.Delete();
+                try
+                {
+                    foreach (var item in new DirectoryInfo(OutputFolder).GetFiles())
+                    {
+                        item.Delete();
+                        break;
+                    }
+                }
+                catch
+                {
+                    Thread.Sleep(1000);
+                }
             }
-
         }
 
 
 
         private void DownloadBtn_Click(object sender, EventArgs e)
         {
+            lock (locked)
+            {
+                if (DownloadBtn.Text.Equals("开始下载"))
+                {
+                    DownloadBtn.Enabled = false;
+                    StartDownload();
+                    DownloadBtn.Text = "取消下载";
+                    DownloadBtn.Enabled = true;
+                }
+                else if(DownloadBtn.Text.Equals("取消下载"))
+                {
+                    StopDownload();
+                }
+            }
+
+            
+        }
+
+        private Thread thread;
+
+        private void StopDownload()
+        {
+            try
+            {
+                thread.Abort();
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                EnabledControl();
+            }
+        }
+
+        private void StartDownload()
+        {
+            Kill();
             string cookie = CookieTB.Text;
             string url = URLTB.Text;
 
@@ -82,8 +181,8 @@ namespace youtube2mp3
                 return;
             }
 
-            URLTB.Enabled = CookieTB.Enabled = DownloadBtn.Enabled = false;
-            new Thread(() =>
+            DisableControl();
+            thread = new Thread(() =>
             {
                 try
                 {
@@ -92,7 +191,9 @@ namespace youtube2mp3
                         this.Invoke((MethodInvoker)(() =>
                         {
                             MessageBox.Show($"下载成功，请自行使用spek等工具检测音频是否超编码");
+                            OutputFolderBtn.PerformClick();
                         }));
+
                     }
                     else
                     {
@@ -113,14 +214,27 @@ namespace youtube2mp3
                 {
                     this.Invoke((MethodInvoker)(() =>
                     {
-                        URLTB.Enabled = CookieTB.Enabled = DownloadBtn.Enabled = true;
-                        CleanRootFolder();
-                        OutputFolderBtn.PerformClick();
+                        EnabledControl();
                     }));
                 }
 
             })
-            { IsBackground = true}.Start();
+            { IsBackground = true };
+            
+            thread.Start();
+        }
+
+        private void DisableControl()
+        {
+            URLTB.Enabled = CookieTB.Enabled = DownloadVideoCB.Enabled = BestVideoCB.Enabled = false;
+        }
+
+        private void EnabledControl()
+        {
+            URLTB.Enabled = CookieTB.Enabled = DownloadVideoCB.Enabled = true;
+            BestVideoCB.Enabled = DownloadVideoCB.Checked;
+            DownloadBtn.Text = "开始下载";
+            CleanRootFolder();
         }
 
         private void OutputFolderBtn_Click(object sender, EventArgs e)
@@ -133,9 +247,10 @@ namespace youtube2mp3
             CleanRootFolder();
             CleanOutputFolder();
             File.WriteAllText(CookiePath, CookieTB.Text);
-            string tempfile = Path.Combine(RootFolder, "temp-file");
 
-            string command = $"--cookies \"{CookiePath}\" -f bestaudio --extract-audio --audio-format best --audio-quality 0 -o \"{tempfile}\" \"{url}\"";
+            //Download video from youtube
+            string tempfile = Path.Combine(RootFolder, "temp-file");
+            string command = $"--cookies \"{CookiePath}\" {GetFormat()}--audio-format best --audio-quality 0 -o \"{tempfile}\" \"{url}\"";
 
             ProcessStartInfo info = new ProcessStartInfo();
             info.FileName = ytdlpPath;
@@ -175,8 +290,9 @@ namespace youtube2mp3
             }
             if (tempfile == null) return false;
 
-            string wavFile = Path.Combine(RootFolder, "temp.wav");
-            command = $"-i \"{tempfile}\" \"{wavFile}\"";
+            //Convert audio file.
+            string audioFile = Path.Combine(OutputFolder, "output-audio-192k.mp3");
+            command = $"-i \"{tempfile}\" -b:a 192k \"{audioFile}\"";
 
             info = new ProcessStartInfo();
             info.FileName = ffmpegPath;
@@ -208,11 +324,18 @@ namespace youtube2mp3
                 }
             }
 
-            if (!File.Exists(wavFile)) return false;
+            if (!File.Exists(audioFile)) return false;
 
 
-            string mp3File = Path.Combine(OutputFolder, "output-192k.mp3");
-            command = $"-i \"{wavFile}\" -b:a 192k \"{mp3File}\"";
+            if (!DownloadVideoCB.Checked)
+            {
+                File.Copy(tempfile, Path.Combine(OutputFolder, $"[原始文件]{new FileInfo(tempfile).Name}"));
+                return true;
+            }
+
+            //Convert video file.
+            string videoFile = Path.Combine(OutputFolder, "output-video-720p-1200k.avi");
+            command = $"-i \"{tempfile}\" {GetQuantity()}-vf \"scale=-1:720\" -an -b:v 1200k -vcodec libx264 \"{videoFile}\"";
 
             info = new ProcessStartInfo();
             info.FileName = ffmpegPath;
@@ -244,10 +367,19 @@ namespace youtube2mp3
                 }
             }
 
-            if (!File.Exists(mp3File)) return false;
+            if (!File.Exists(videoFile)) return false;
 
-            File.Copy(wavFile, Path.Combine(OutputFolder, "油管音源.wav"));
+            File.Copy(tempfile, Path.Combine(OutputFolder, $"[原始文件]{new FileInfo(tempfile).Name}"));
             return true;
+        }
+
+        private object GetFormat() => DownloadVideoCB.Checked ? "" : "-f bestaudio --extract-audio ";
+
+        private object GetQuantity() => BestVideoCB.Checked ? "-preset placebo " : "";
+
+        private void AudioOnlyCB_CheckedChanged(object sender, EventArgs e)
+        {
+            BestVideoCB.Enabled = DownloadVideoCB.Checked;
         }
     }
 }

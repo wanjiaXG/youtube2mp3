@@ -36,6 +36,8 @@ namespace youtube2mp3
             this.LogTB = new System.Windows.Forms.TextBox();
             this.DownloadBtn = new System.Windows.Forms.Button();
             this.OutputFolderBtn = new System.Windows.Forms.Button();
+            this.BestVideoCB = new System.Windows.Forms.CheckBox();
+            this.DownloadVideoCB = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // CookieLB
@@ -49,6 +51,8 @@ namespace youtube2mp3
             // 
             // CookieTB
             // 
+            this.CookieTB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.CookieTB.Location = new System.Drawing.Point(15, 40);
             this.CookieTB.Multiline = true;
             this.CookieTB.Name = "CookieTB";
@@ -67,6 +71,8 @@ namespace youtube2mp3
             // 
             // URLTB
             // 
+            this.URLTB.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.URLTB.Location = new System.Drawing.Point(69, 163);
             this.URLTB.Name = "URLTB";
             this.URLTB.Size = new System.Drawing.Size(643, 21);
@@ -74,6 +80,9 @@ namespace youtube2mp3
             // 
             // LogTB
             // 
+            this.LogTB.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.LogTB.Location = new System.Drawing.Point(15, 202);
             this.LogTB.Multiline = true;
             this.LogTB.Name = "LogTB";
@@ -84,6 +93,7 @@ namespace youtube2mp3
             // 
             // DownloadBtn
             // 
+            this.DownloadBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.DownloadBtn.Location = new System.Drawing.Point(719, 163);
             this.DownloadBtn.Name = "DownloadBtn";
             this.DownloadBtn.Size = new System.Drawing.Size(75, 23);
@@ -94,6 +104,7 @@ namespace youtube2mp3
             // 
             // OutputFolderBtn
             // 
+            this.OutputFolderBtn.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.OutputFolderBtn.Location = new System.Drawing.Point(15, 317);
             this.OutputFolderBtn.Name = "OutputFolderBtn";
             this.OutputFolderBtn.Size = new System.Drawing.Size(147, 23);
@@ -102,11 +113,35 @@ namespace youtube2mp3
             this.OutputFolderBtn.UseVisualStyleBackColor = true;
             this.OutputFolderBtn.Click += new System.EventHandler(this.OutputFolderBtn_Click);
             // 
+            // FastConvertCB
+            // 
+            this.BestVideoCB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.BestVideoCB.Enabled = false;
+            this.BestVideoCB.Location = new System.Drawing.Point(512, 318);
+            this.BestVideoCB.Name = "FastConvertCB";
+            this.BestVideoCB.Size = new System.Drawing.Size(282, 24);
+            this.BestVideoCB.TabIndex = 7;
+            this.BestVideoCB.Text = "最佳视频质量(耗时长，高CPU占用，不建议启用)";
+            this.BestVideoCB.UseVisualStyleBackColor = true;
+            // 
+            // DownloadVideoCB
+            // 
+            this.DownloadVideoCB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.DownloadVideoCB.Location = new System.Drawing.Point(419, 318);
+            this.DownloadVideoCB.Name = "DownloadVideoCB";
+            this.DownloadVideoCB.Size = new System.Drawing.Size(87, 24);
+            this.DownloadVideoCB.TabIndex = 8;
+            this.DownloadVideoCB.Text = "下载视频";
+            this.DownloadVideoCB.UseVisualStyleBackColor = true;
+            this.DownloadVideoCB.CheckedChanged += new System.EventHandler(this.AudioOnlyCB_CheckedChanged);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(807, 351);
+            this.Controls.Add(this.DownloadVideoCB);
+            this.Controls.Add(this.BestVideoCB);
             this.Controls.Add(this.OutputFolderBtn);
             this.Controls.Add(this.DownloadBtn);
             this.Controls.Add(this.LogTB);
@@ -130,6 +165,8 @@ namespace youtube2mp3
         private System.Windows.Forms.TextBox LogTB;
         private System.Windows.Forms.Button DownloadBtn;
         private System.Windows.Forms.Button OutputFolderBtn;
+        private System.Windows.Forms.CheckBox BestVideoCB;
+        private System.Windows.Forms.CheckBox DownloadVideoCB;
     }
 }
 
