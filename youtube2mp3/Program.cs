@@ -38,7 +38,7 @@ namespace youtube2mp3
                     if (!IsRunAsAdministrator())
                     {
                         DialogResult result = MessageBox.Show(
-                            "检测到当前系统为 Windows 11及以上，需要以管理员权限运行。\n是否重新启动？",
+                            "检测到当前系统为Windows 11及以上，需要以管理员权限运行。\n是否重新启动？",
                             "权限提示",
                             MessageBoxButtons.YesNo,
                             MessageBoxIcon.Question
