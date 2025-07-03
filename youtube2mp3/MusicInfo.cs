@@ -85,7 +85,7 @@ namespace youtube2mp3
         {
             // 启动外部程序
             embeddedProcess = new Process();
-            embeddedProcess.StartInfo.FileName = $"\"{exePath}\"";
+            embeddedProcess.StartInfo.FileName = exePath;
             embeddedProcess.StartInfo.Arguments = $"\"{arguments}\"";
             embeddedProcess.StartInfo.UseShellExecute = false;
             embeddedProcess.Start();
