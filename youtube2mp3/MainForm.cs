@@ -169,13 +169,23 @@ namespace youtube2mp3
                 if (currentVersion == null || !currentVersion.Equals(tagName.ToString()))
                 {
                     string downloadUrl = $"https://github.com/yt-dlp/yt-dlp/releases/download/{tagName}/yt-dlp.exe";
-                    var form = new DownloadYTDLPForm(downloadUrl);
+                    //var form = new DownloadYTDLPForm(downloadUrl);
+
                     this.Invoke((MethodInvoker)(() =>
                     {
-                        form.ShowDialog();
-                        File.WriteAllBytes(ytdlpPath, form.FileData);
-                        
-                        form.Dispose();
+                        using (var form = new DownloadYTDLPForm(downloadUrl))
+                        {
+                            var dialogResult = form.ShowDialog();
+                            if (dialogResult == DialogResult.OK && !form.IsUserCancelled)
+                            {
+                                File.WriteAllBytes(ytdlpPath, form.FileData);
+                            }
+                            else
+                            {
+                                MessageBox.Show("下载失败或被中断！请检查网络后重试！");
+                                Environment.Exit(-1);
+                            }
+                        }
                     }));
                 }
             }

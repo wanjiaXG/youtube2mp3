@@ -15,8 +15,10 @@ namespace youtube2mp3
         private long totalBytesRead = 0;
         private int finishedThreads = 0;
         private object lockObj = new object();
+        private CancellationTokenSource cancelTokenSource = new CancellationTokenSource();
 
         public byte[] FileData { get; private set; }
+        public bool IsUserCancelled { get; private set; } = false;
 
         public DownloadYTDLPForm(string downloadUrl)
         {
@@ -24,16 +26,43 @@ namespace youtube2mp3
             this.downloadUrl = downloadUrl;
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                DialogResult result = MessageBox.Show(
+                    "取消更新后本工具将无法使用，确定要退出吗？",
+                    "提示",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.No)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+
+                // 用户确认取消
+                IsUserCancelled = true;
+                cancelTokenSource.Cancel();
+
+                // 设置 DialogResult 为 Cancel
+                this.DialogResult = DialogResult.Cancel;
+            }
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-            Thread t = new Thread(PrepareDownload);
+            Thread t = new Thread(() => PrepareDownload(cancelTokenSource.Token));
             t.IsBackground = true;
             t.Start();
         }
 
-
-        private void PrepareDownload()
+        private void PrepareDownload(CancellationToken token)
         {
             try
             {
@@ -47,8 +76,7 @@ namespace youtube2mp3
 
                 if (contentLength <= 0)
                 {
-                    ShowError("服务器未返回有效的文件大小");
-                    return;
+                    throw new Exception("网络错误！");
                 }
 
                 parts = new byte[threadCount][];
@@ -60,24 +88,32 @@ namespace youtube2mp3
                     long start = index * partSize;
                     long end = (index == threadCount - 1) ? contentLength - 1 : (start + partSize - 1);
 
-                    Thread t = new Thread(() => DownloadPart(index, start, end));
+                    Thread t = new Thread(() => DownloadPart(index, start, end, token));
                     t.IsBackground = true;
                     t.Start();
                 }
             }
             catch (Exception ex)
             {
-                ShowError("初始化失败：" + ex.Message);
+                // 可扩展：日志记录或弹窗提示
+                Invoke((MethodInvoker)(() =>
+                {
+                    MessageBox.Show("下载准备失败：" + ex.Message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.DialogResult = DialogResult.Abort;
+                    this.Close();
+                }));
             }
         }
 
-        private void DownloadPart(int index, long start, long end)
+        private void DownloadPart(int index, long start, long end, CancellationToken token)
         {
             try
             {
+                if (token.IsCancellationRequested) return;
+
                 HttpWebRequest req = (HttpWebRequest)WebRequest.Create(downloadUrl);
                 req.Method = "GET";
-                req.UserAgent = "Mozilla/5.0";
+                req.UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)";
                 req.AddRange(start, end);
 
                 using (WebResponse resp = req.GetResponse())
@@ -87,28 +123,35 @@ namespace youtube2mp3
                     byte[] buffer = new byte[8192];
                     int bytesRead;
 
-                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    while (!token.IsCancellationRequested &&
+                           (bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
                         ms.Write(buffer, 0, bytesRead);
                         long totalSoFar = Interlocked.Add(ref totalBytesRead, bytesRead);
                         UpdateProgress((double)totalSoFar / contentLength * 100.0);
                     }
 
-                    parts[index] = ms.ToArray();
+                    if (!token.IsCancellationRequested)
+                    {
+                        parts[index] = ms.ToArray();
+                    }
                 }
             }
-            catch (Exception ex)
+            catch
             {
-                ShowError("线程 " + index + " 下载失败：" + ex.Message);
+                // 可选：记录错误或显示警告
             }
             finally
             {
-                lock (lockObj)
+                if (!token.IsCancellationRequested) 
                 {
-                    finishedThreads++;
-                    if (finishedThreads == threadCount)
+                    lock (lockObj)
                     {
-                        MergeParts();
+                        finishedThreads++;
+                        if (finishedThreads == threadCount)
+                        {
+                            MergeParts();
+                        }
                     }
                 }
             }
@@ -116,11 +159,14 @@ namespace youtube2mp3
 
         private void UpdateProgress(double percent)
         {
-            this.Invoke((MethodInvoker)delegate
+            if (this.IsHandleCreated && !this.IsDisposed)
             {
-                ProgressBar.Value = Math.Min(100, (int)percent);
-                ProgressLabel.Text = string.Format("{0:0.00}%", percent);
-            });
+                this.Invoke((MethodInvoker)delegate
+                {
+                    ProgressBar.Value = Math.Min(100, (int)percent);
+                    ProgressLabel.Text = string.Format("{0:0.00}%", percent);
+                });
+            }
         }
 
         private void MergeParts()
@@ -136,22 +182,16 @@ namespace youtube2mp3
 
             FileData = output.ToArray();
 
-            this.Invoke((MethodInvoker)delegate
+            if (this.IsHandleCreated && !this.IsDisposed)
             {
-                ProgressBar.Value = 100;
-                ProgressLabel.Text = "下载完成 100%";
-                this.DialogResult = DialogResult.OK;  // 设置返回结果
-                this.Close();
-            });
-        }
-
-        private void ShowError(string message)
-        {
-            this.Invoke((MethodInvoker)delegate
-            {
-                MessageBox.Show(message, "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                this.Close();
-            });
+                this.Invoke((MethodInvoker)delegate
+                {
+                    ProgressBar.Value = 100;
+                    ProgressLabel.Text = "下载完成 100%";
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                });
+            }
         }
     }
 }
