@@ -24,7 +24,7 @@ namespace youtube2mp3
         private bool allowClose = false; // 默认不允许关闭
 
         public static string RootFolder = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), //"Local",
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),  //"Local",
                 "youtube2mp3");
 
         public static string OutputFolder = Path.Combine(RootFolder, "output");
