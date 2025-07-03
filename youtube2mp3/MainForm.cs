@@ -234,11 +234,17 @@ namespace youtube2mp3
         private void Kill()
         {
             Process process = Process.GetCurrentProcess();
-            foreach(var item in Process.GetProcesses())
+
+            foreach (var item in Process.GetProcesses())
             {
                 try
                 {
-                    if(item.Id != process.Id && item.MainModule.FileName.Contains("youtube2mp3"))
+                    if ((item.Id != process.Id && item.MainModule.FileName.Contains("youtube2mp3")) ||
+                        (item.MainModule.FileName.Contains("spek") && item.MainModule.FileName.Contains("youtube2mp3")) ||
+                        (item.MainModule.FileName.Contains("TimingAnlyz") && item.MainModule.FileName.Contains("youtube2mp3")) ||
+                        (item.MainModule.FileName.Contains("ffmpeg") && item.MainModule.FileName.Contains("youtube2mp3")) ||
+                        (item.MainModule.FileName.Contains("yt-dlp") && item.MainModule.FileName.Contains("youtube2mp3"))
+                        )
                     {
                         item.Kill();
                     }
