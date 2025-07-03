@@ -75,7 +75,8 @@ namespace youtube2mp3
         {
             this.Invoke((MethodInvoker)(() =>
             {
-                DownloadBtn.Text = "初始化中";
+                loadingLabel.Visible = true;
+                //DownloadBtn.Text = "初始化中";
                 DownloadBtn.Enabled = false;
             }));
 
@@ -99,7 +100,7 @@ namespace youtube2mp3
             
             this.Invoke((MethodInvoker)(() =>
             {
-                DownloadBtn.Text = "开始下载";
+                loadingLabel.Visible = false;
                 DownloadBtn.Enabled = true;
                 allowClose = true;
             }));

@@ -38,15 +38,16 @@ namespace youtube2mp3
             this.OutputFolderBtn = new System.Windows.Forms.Button();
             this.BestVideoCB = new System.Windows.Forms.CheckBox();
             this.DownloadVideoCB = new System.Windows.Forms.CheckBox();
+            this.loadingLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // CookieLB
             // 
             this.CookieLB.Location = new System.Drawing.Point(13, 13);
             this.CookieLB.Name = "CookieLB";
-            this.CookieLB.Size = new System.Drawing.Size(49, 23);
+            this.CookieLB.Size = new System.Drawing.Size(307, 23);
             this.CookieLB.TabIndex = 0;
-            this.CookieLB.Text = "Cookie";
+            this.CookieLB.Text = "Cookie(目前仅下载youtube需要, 其他视频平台可留空)";
             this.CookieLB.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // CookieTB
@@ -135,11 +136,23 @@ namespace youtube2mp3
             this.DownloadVideoCB.UseVisualStyleBackColor = true;
             this.DownloadVideoCB.CheckedChanged += new System.EventHandler(this.AudioOnlyCB_CheckedChanged);
             // 
+            // loadingLabel
+            // 
+            this.loadingLabel.Font = new System.Drawing.Font("宋体", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.loadingLabel.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
+            this.loadingLabel.Location = new System.Drawing.Point(487, 11);
+            this.loadingLabel.Name = "loadingLabel";
+            this.loadingLabel.Size = new System.Drawing.Size(307, 23);
+            this.loadingLabel.TabIndex = 9;
+            this.loadingLabel.Text = "正在初始化程序...";
+            this.loadingLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(807, 351);
+            this.Controls.Add(this.loadingLabel);
             this.Controls.Add(this.DownloadVideoCB);
             this.Controls.Add(this.BestVideoCB);
             this.Controls.Add(this.OutputFolderBtn);
@@ -152,7 +165,7 @@ namespace youtube2mp3
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Youtube2MP3";
+            this.Text = "从在线视频到屙屎[基于yt-dlp] by wanjia 2025-07-03 (支持youtube, bilibili, twitter)";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -169,6 +182,7 @@ namespace youtube2mp3
         private System.Windows.Forms.Button OutputFolderBtn;
         private System.Windows.Forms.CheckBox BestVideoCB;
         private System.Windows.Forms.CheckBox DownloadVideoCB;
+        private System.Windows.Forms.Label loadingLabel;
     }
 }
 
