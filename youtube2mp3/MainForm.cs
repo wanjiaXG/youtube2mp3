@@ -70,7 +70,7 @@ namespace youtube2mp3
                 DownloadBtn.Enabled = false;
             }));
 
-            LoadNewtonsoft();
+            
 
             Kill();
             Directory.CreateDirectory(RootFolder);
@@ -84,7 +84,7 @@ namespace youtube2mp3
             }
 
             DownloadYTDLP(ytdlpPath);
-
+            LoadNewtonsoft();
             this.Invoke((MethodInvoker)(() =>
             {
                 DownloadBtn.Text = "开始下载";
