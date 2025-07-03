@@ -113,12 +113,12 @@ namespace youtube2mp3
             this.OutputFolderBtn.UseVisualStyleBackColor = true;
             this.OutputFolderBtn.Click += new System.EventHandler(this.OutputFolderBtn_Click);
             // 
-            // FastConvertCB
+            // BestVideoCB
             // 
             this.BestVideoCB.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BestVideoCB.Enabled = false;
             this.BestVideoCB.Location = new System.Drawing.Point(512, 318);
-            this.BestVideoCB.Name = "FastConvertCB";
+            this.BestVideoCB.Name = "BestVideoCB";
             this.BestVideoCB.Size = new System.Drawing.Size(282, 24);
             this.BestVideoCB.TabIndex = 7;
             this.BestVideoCB.Text = "最佳视频质量(耗时长，高CPU占用，不建议启用)";
@@ -149,6 +149,7 @@ namespace youtube2mp3
             this.Controls.Add(this.URLLB);
             this.Controls.Add(this.CookieTB);
             this.Controls.Add(this.CookieLB);
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "Youtube2MP3";
             this.ResumeLayout(false);

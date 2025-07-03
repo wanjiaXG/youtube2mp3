@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using youtube2mp3.Properties;
 
 namespace youtube2mp3
 {
@@ -18,5 +21,7 @@ namespace youtube2mp3
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
         }
+
+        
     }
 }

@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,6 +20,8 @@ namespace youtube2mp3
 {
     public partial class MainForm : Form
     {
+        private bool allowClose = false; // 默认不允许关闭
+
         private static string RootFolder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 "youtube2mp3");
@@ -28,6 +34,8 @@ namespace youtube2mp3
 
         private static string CookiePath = Path.Combine(RootFolder, "cookie.txt");
 
+        private static string NewtonsoftPath = Path.Combine(RootFolder, "Newtonsoft.Json.dll");
+
         private static object locked = new object();
 
         public MainForm()
@@ -35,8 +43,22 @@ namespace youtube2mp3
             InitializeComponent();
         }
 
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (!allowClose)
+            {
+                // 阻止用户点击“×”关闭
+                e.Cancel = true;
+                // 可选提示
+                // MessageBox.Show("当前不能关闭窗口！");
+            }
+
+            base.OnFormClosing(e);
+        }
+
         protected override void OnLoad(EventArgs e)
         {
+            
             new Thread(Init).Start();
         }
 
@@ -48,21 +70,128 @@ namespace youtube2mp3
                 DownloadBtn.Enabled = false;
             }));
 
+            LoadNewtonsoft();
+
             Kill();
             Directory.CreateDirectory(RootFolder);
             Directory.CreateDirectory(OutputFolder);
             CleanRootFolder();
             CleanOutputFolder();
-            File.WriteAllBytes(ffmpegPath, Resources.ffmpeg);
-            File.WriteAllBytes(ytdlpPath, Resources.yt_dlp);
+
+            if (!File.Exists(ffmpegPath) || new FileInfo(ffmpegPath).Length == Resources.ffmpeg.Length)
+            {
+                File.WriteAllBytes(ffmpegPath, Resources.ffmpeg);
+            }
+
+            DownloadYTDLP(ytdlpPath);
 
             this.Invoke((MethodInvoker)(() =>
             {
                 DownloadBtn.Text = "开始下载";
                 DownloadBtn.Enabled = true;
+                allowClose = true;
             }));
         }
 
+        private static void LoadNewtonsoft()
+        {
+            if (!File.Exists(NewtonsoftPath))
+                File.WriteAllBytes(NewtonsoftPath, Resources.Newtonsoft_Json);
+            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+        }
+
+        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            return Assembly.LoadFrom(NewtonsoftPath);
+        }
+
+        private void DownloadYTDLP(string ytdlpPath)
+        {
+            try
+            {
+                string currentVersion = GetLocalYtDlpVersion();
+                
+                UpdateLatestVersion(currentVersion);
+                currentVersion = GetLocalYtDlpVersion();
+                if(currentVersion == null)
+                {
+                    throw new Exception("未知错误!");
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"无法下载yt-dlp，请检查网络！\n{ex.Message}");
+                Environment.Exit(-1);
+            }
+        }
+
+        private string GetLocalYtDlpVersion()
+        {
+            if (!File.Exists(ytdlpPath))
+                return null;
+
+            try
+            {
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    FileName = ytdlpPath,
+                    Arguments = "--version",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using (Process process = Process.Start(psi))
+                {
+                    process.WaitForExit();
+                    string output = process.StandardOutput.ReadToEnd().Trim();
+                    return output;
+                }
+                    
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error running yt-dlp: " + ex.Message);
+                return null;
+            }
+        }
+
+        private void UpdateLatestVersion(string currentVersion)
+        {
+            WebClient client = new WebClient();
+            client.Headers["User-Agent"] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36";
+            client.Headers["Referer"] = "https://github.com/yt-dlp/yt-dlp/releases/";
+            client.Headers["Oigin"] = "https://github.com";
+            string result = client.DownloadString("https://api.github.com/repos/yt-dlp/yt-dlp/releases/latest");
+            JObject json = JObject.Parse(result);
+            if (json.TryGetValue("tag_name", out JToken tagName))
+            {
+                if (currentVersion == null || !currentVersion.Equals(tagName.ToString()))
+                {
+                    string downloadUrl = $"https://github.com/yt-dlp/yt-dlp/releases/download/{tagName}/yt-dlp.exe";
+                    var form = new DownloadYTDLPForm(downloadUrl);
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        form.ShowDialog();
+                        File.WriteAllBytes(ytdlpPath, form.FileData);
+                        
+                        form.Dispose();
+                    }));
+                }
+            }
+        }
+
+
+        public static byte[] DecompressGZip(byte[] compressedData)
+        {
+            using (var compressedStream = new MemoryStream(compressedData))
+            using (var gzipStream = new GZipStream(compressedStream, CompressionMode.Decompress))
+            using (var resultStream = new MemoryStream())
+            {
+                gzipStream.CopyTo(resultStream);
+                return resultStream.ToArray();
+            }
+        }
         private void Kill()
         {
             Process process = Process.GetCurrentProcess();
@@ -70,7 +199,6 @@ namespace youtube2mp3
             {
                 try
                 {
-                    Console.WriteLine(item.MainModule.FileName);
                     if(item.Id != process.Id && item.MainModule.FileName.Contains("youtube2mp3"))
                     {
                         item.Kill();
@@ -81,6 +209,7 @@ namespace youtube2mp3
 
                 }
             }
+            
         }
 
         private void CleanRootFolder()
