@@ -111,7 +111,7 @@ namespace youtube2mp3
             Extract(spekPath, Resources.spek);
             Directory.CreateDirectory(spekRootPath);
             CleanFoler(spekRootPath);
-            ZipFile.ExtractToDirectory(spekPath, RootFolder);
+            ZipFile.ExtractToDirectory(spekPath, spekRootPath);
         }
 
 
