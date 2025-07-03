@@ -42,7 +42,7 @@ namespace youtube2mp3
             | System.Windows.Forms.AnchorStyles.Right)));
             this.SpekPanel.Location = new System.Drawing.Point(12, 273);
             this.SpekPanel.Name = "SpekPanel";
-            this.SpekPanel.Size = new System.Drawing.Size(776, 360);
+            this.SpekPanel.Size = new System.Drawing.Size(776, 480);
             this.SpekPanel.TabIndex = 0;
             // 
             // TimingPanel
@@ -76,7 +76,7 @@ namespace youtube2mp3
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 645);
+            this.ClientSize = new System.Drawing.Size(800, 765);
             this.Controls.Add(this.SpekLabel);
             this.Controls.Add(this.TimingLabel);
             this.Controls.Add(this.TimingPanel);

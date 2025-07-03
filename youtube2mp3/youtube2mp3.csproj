@@ -100,18 +100,6 @@
     <Compile Include="DownloadYTDLPForm.Designer.cs">
       <DependentUpon>DownloadYTDLPForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ClearForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ClearForm.Designer.cs">
-      <DependentUpon>ClearForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="InfoUserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="InfoUserControl.Designer.cs">
-      <DependentUpon>InfoUserControl.cs</DependentUpon>
-    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -128,12 +116,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="DownloadYTDLPForm.resx">
       <DependentUpon>DownloadYTDLPForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ClearForm.resx">
-      <DependentUpon>ClearForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="InfoUserControl.resx">
-      <DependentUpon>InfoUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
@@ -179,12 +161,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Newtonsoft.Json.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\TimingAnlyz.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\bass.dll" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\TimingAnlyz.exe" />

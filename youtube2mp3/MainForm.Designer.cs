@@ -165,7 +165,7 @@ namespace youtube2mp3
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "从在线视频到屙屎[基于yt-dlp] by wanjia 2025-07-03 (支持youtube, bilibili, twitter)";
+            this.Text = "从在线视频到屙屎编辑器[基于yt-dlp] by wanjia 2025-07-03 (支持youtube, bilibili, twitter)";
             this.ResumeLayout(false);
             this.PerformLayout();
 
