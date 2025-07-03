@@ -1,6 +1,10 @@
+2025-07-03更新：去除本地yt-dlp，每次启动检测并更新yt-dlp版本，避免由于油管策略更新导致的下载失败问题。
+添加一个外部dll，用于解析json，dll打包进exe，启动后会释放文件并热加载dll
+
 帮朋友抓油管音频写的，本来写了个bat，但想想还是写个GUI算了
 
 工具使用了[ffmpeg](https://github.com/FFmpeg/FFmpeg)和[yt-dlp](https://github.com/yt-dlp/yt-dlp)配合命令行实现
+使用第三方库[Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json)
 可直接转换为osu的Ranked标准的192k-mp3音频
 
 需要提供cookie
