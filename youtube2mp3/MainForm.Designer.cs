@@ -151,6 +151,7 @@ namespace youtube2mp3
             this.Controls.Add(this.CookieLB);
             this.MaximizeBox = false;
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Youtube2MP3";
             this.ResumeLayout(false);
             this.PerformLayout();

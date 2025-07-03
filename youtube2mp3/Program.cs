@@ -20,6 +20,9 @@ namespace youtube2mp3
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new MainForm());
+            //MusicInfoForm form = new MusicInfoForm();
+            //form.ShowInfo(@"C:\Users\admin\Documents\youtube2mp3\output-audio-192k.mp3");
+            //Application.Run(form);
         }
 
         

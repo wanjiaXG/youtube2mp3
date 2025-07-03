@@ -19,6 +19,7 @@ namespace youtube2mp3
 
         public byte[] FileData { get; private set; }
         public bool IsUserCancelled { get; private set; } = false;
+        public bool IsFinish { get; private set; } = false;
 
         public DownloadYTDLPForm(string downloadUrl)
         {
@@ -30,7 +31,7 @@ namespace youtube2mp3
         {
             base.OnFormClosing(e);
 
-            if (e.CloseReason == CloseReason.UserClosing)
+            if (!IsFinish && e.CloseReason == CloseReason.UserClosing)
             {
                 DialogResult result = MessageBox.Show(
                     "取消更新后本工具将无法使用，确定要退出吗？",
@@ -181,7 +182,7 @@ namespace youtube2mp3
             }
 
             FileData = output.ToArray();
-
+            this.IsFinish = true;
             if (this.IsHandleCreated && !this.IsDisposed)
             {
                 this.Invoke((MethodInvoker)delegate

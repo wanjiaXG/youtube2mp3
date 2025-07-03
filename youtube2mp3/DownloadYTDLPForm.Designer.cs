@@ -78,6 +78,7 @@ namespace youtube2mp3
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(419, 141);
             this.Name = "DownloadYTDLPForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "检测到有新版本yt-dlp 正在更新...";
             this.ResumeLayout(false);
 

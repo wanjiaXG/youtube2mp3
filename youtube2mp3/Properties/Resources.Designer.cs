@@ -63,6 +63,16 @@ namespace youtube2mp3.Properties {
         /// <summary>
         ///   查找 System.Byte[] 类型的本地化资源。
         /// </summary>
+        internal static byte[] bass {
+            get {
+                object obj = ResourceManager.GetObject("bass", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
         internal static byte[] ffmpeg {
             get {
                 object obj = ResourceManager.GetObject("ffmpeg", resourceCulture);
@@ -76,6 +86,26 @@ namespace youtube2mp3.Properties {
         internal static byte[] Newtonsoft_Json {
             get {
                 object obj = ResourceManager.GetObject("Newtonsoft_Json", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
+        internal static byte[] spek {
+            get {
+                object obj = ResourceManager.GetObject("spek", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   查找 System.Byte[] 类型的本地化资源。
+        /// </summary>
+        internal static byte[] TimingAnlyz {
+            get {
+                object obj = ResourceManager.GetObject("TimingAnlyz", resourceCulture);
                 return ((byte[])(obj));
             }
         }

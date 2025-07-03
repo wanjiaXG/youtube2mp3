@@ -11,6 +11,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,19 +23,27 @@ namespace youtube2mp3
     {
         private bool allowClose = false; // 默认不允许关闭
 
-        private static string RootFolder = Path.Combine(
+        public static string RootFolder = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 "youtube2mp3");
 
-        private static string OutputFolder = Path.Combine(RootFolder, "output");
+        public static string OutputFolder = Path.Combine(RootFolder, "output");
 
-        private static string ffmpegPath = Path.Combine(RootFolder, "ffmpeg.exe");
+        public static string ffmpegPath = Path.Combine(RootFolder, "ffmpeg.exe");
 
-        private static string ytdlpPath = Path.Combine(RootFolder, "yt-dlp.exe");
+        public static string ytdlpPath = Path.Combine(RootFolder, "yt-dlp.exe");
 
-        private static string CookiePath = Path.Combine(RootFolder, "cookie.txt");
+        public static string CookiePath = Path.Combine(RootFolder, "cookie.txt");
 
-        private static string NewtonsoftPath = Path.Combine(RootFolder, "Newtonsoft.Json.dll");
+        public static string NewtonsoftPath = Path.Combine(RootFolder, "Newtonsoft.Json.dll");
+
+        public static string BassPath = Path.Combine(RootFolder, "bass.dll");
+
+        public static string TimingAnlyzPath = Path.Combine(RootFolder, "TimingAnlyz.exe");
+
+        public static string spekPath = Path.Combine(RootFolder, "spek.zip");
+
+        public static string spekRootPath = Path.Combine(RootFolder, "spek");
 
         private static object locked = new object();
 
@@ -78,10 +87,13 @@ namespace youtube2mp3
             CleanRootFolder();
             CleanOutputFolder();
 
-            if (!File.Exists(ffmpegPath) || new FileInfo(ffmpegPath).Length == Resources.ffmpeg.Length)
-            {
-                File.WriteAllBytes(ffmpegPath, Resources.ffmpeg);
-            }
+            Extract(ffmpegPath, Resources.ffmpeg);
+            Extract(BassPath, Resources.bass);
+            Extract(TimingAnlyzPath, Resources.TimingAnlyz);
+            
+            LoadSpek();
+
+
             LoadNewtonsoft();
             DownloadYTDLP(ytdlpPath);
             
@@ -93,14 +105,30 @@ namespace youtube2mp3
             }));
         }
 
-        private static void LoadNewtonsoft()
+        private void LoadSpek()
         {
-            if (!File.Exists(NewtonsoftPath))
-                File.WriteAllBytes(NewtonsoftPath, Resources.Newtonsoft_Json);
+            Extract(spekPath, Resources.spek);
+            Directory.CreateDirectory(spekRootPath);
+            CleanFoler(spekRootPath);
+            ZipFile.ExtractToDirectory(spekPath, RootFolder);
+        }
+
+
+        private void Extract(string path, byte[] buff)
+        {
+            if (!File.Exists(path) || new FileInfo(path).Length == Resources.ffmpeg.Length)
+            {
+                File.WriteAllBytes(path, buff);
+            }
+        }
+
+        private void LoadNewtonsoft()
+        {
+            Extract(NewtonsoftPath, Resources.Newtonsoft_Json);
             AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
         }
 
-        private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             return Assembly.LoadFrom(NewtonsoftPath);
         }
@@ -222,6 +250,44 @@ namespace youtube2mp3
             
         }
 
+        //private void CleanFoler(string path)
+        //{
+        //    for (int i = 0; i <= 10; i++)
+        //    {
+        //        try
+        //        {
+        //            foreach (var item in new DirectoryInfo(path).GetFiles())
+        //            {
+        //                item.Delete();
+        //                break;
+        //            }
+        //        }
+        //        catch
+        //        {
+        //            Thread.Sleep(1000);
+        //        }
+        //    }
+        //}
+
+        void CleanFoler(string path)
+        {
+            if (!Directory.Exists(path)) return;
+
+            // 删除所有文件
+            foreach (string file in Directory.GetFiles(path))
+            {
+                File.SetAttributes(file, FileAttributes.Normal); // 解除只读等属性
+                File.Delete(file);
+            }
+
+            // 删除所有子目录
+            foreach (string dir in Directory.GetDirectories(path))
+            {
+                CleanFoler(dir); // 递归删除子目录
+                Directory.Delete(dir);
+            }
+        }
+
         private void CleanRootFolder()
         {
             for (int i = 0; i <= 10; i++)
@@ -245,21 +311,7 @@ namespace youtube2mp3
 
         private void CleanOutputFolder()
         {
-            for(int i = 0; i <= 10; i++)
-            {
-                try
-                {
-                    foreach (var item in new DirectoryInfo(OutputFolder).GetFiles())
-                    {
-                        item.Delete();
-                        break;
-                    }
-                }
-                catch
-                {
-                    Thread.Sleep(1000);
-                }
-            }
+            CleanFoler(OutputFolder);
         }
 
 
@@ -271,9 +323,16 @@ namespace youtube2mp3
                 if (DownloadBtn.Text.Equals("开始下载"))
                 {
                     DownloadBtn.Enabled = false;
-                    StartDownload();
-                    DownloadBtn.Text = "取消下载";
-                    DownloadBtn.Enabled = true;
+                    if(StartDownload() == 0)
+                    {
+                        DownloadBtn.Text = "取消下载";
+                        DownloadBtn.Enabled = true;
+                    }
+                    else
+                    {
+                        DownloadBtn.Enabled = true;
+                    }
+                    
                 }
                 else if(DownloadBtn.Text.Equals("取消下载"))
                 {
@@ -302,22 +361,55 @@ namespace youtube2mp3
             }
         }
 
-        private void StartDownload()
+        public static bool IsValidUrl(string url)
+        {
+            string pattern = @"^https?://[^\s/$.?#].[^\s]*$";
+            return Regex.IsMatch(url, pattern, RegexOptions.IgnoreCase);
+        }
+
+        private int StartDownload()
         {
             Kill();
             string cookie = CookieTB.Text;
             string url = URLTB.Text;
+            string pattern = @"^(https?://)?([a-zA-Z0-9.-]+)(:[0-9]+)?(/.*)?$";
 
-            if (string.IsNullOrWhiteSpace(cookie))
+
+            if (!IsValidUrl(url))
+            {
+                MessageBox.Show("请输入正确的视频地址后再继续");
+                return -1;
+            }
+/*
+            if (url.Contains("youtube"))
+            {
+                //https://www.youtube.com/watch?v=1SWQWOs3HUA&list=PLrO67VV2uuoR2b2dYw_7jFXghMrInakS6
+                int index = url.IndexOf("v=");
+                if(index >= 0)
+                {
+                    string cut = url.Substring(index);
+                    index = cut.IndexOf("&");
+                    if(index >= 0)
+                    {
+                        url = $"https://www.youtube.com/watch?v={cut.Substring(2, index - 2)}";
+                    }
+                }
+                
+
+            }
+            else if (url.Contains("youtu.be") || url.Contains("bilibili"))
+            {
+                int index = url.IndexOf("?");
+                if (index >= 0)
+                {
+                    url = url.Substring(0, index);
+                }
+            }*/
+
+            if ((url.Contains("youtu.be") || url.Contains("youtube.com")) && string.IsNullOrWhiteSpace(cookie))
             {
                 MessageBox.Show("请输入cookie后再继续");
-                return;
-            }
-
-            if (string.IsNullOrWhiteSpace(url))
-            {
-                MessageBox.Show("请输入视频地址后再继续");
-                return;
+                return -1;
             }
 
             DisableControl();
@@ -325,11 +417,15 @@ namespace youtube2mp3
             {
                 try
                 {
-                    if (Download(url))
+                    string path = Download(url);
+                    if (path != null)
                     {
                         this.Invoke((MethodInvoker)(() =>
                         {
-                            MessageBox.Show($"下载成功，请自行使用spek等工具检测音频是否超编码");
+                            //MessageBox.Show($"下载成功，请自行使用spek等工具检测音频是否超编码");
+                            var form = new MusicInfoForm();
+                            form.ShowInfo(path);
+                            form.Show();
                             OutputFolderBtn.PerformClick();
                         }));
 
@@ -361,6 +457,7 @@ namespace youtube2mp3
             { IsBackground = true };
             
             thread.Start();
+            return 0;
         }
 
         private void DisableControl()
@@ -381,7 +478,7 @@ namespace youtube2mp3
             Process.Start(OutputFolder);
         }
 
-        private bool Download(string url)
+        private string Download(string url)
         {
             CleanRootFolder();
             CleanOutputFolder();
@@ -389,7 +486,9 @@ namespace youtube2mp3
 
             //Download video from youtube
             string tempfile = Path.Combine(RootFolder, "temp-file");
-            string command = $"--cookies \"{CookiePath}\" {GetFormat()}--audio-format best --audio-quality 0 -o \"{tempfile}\" \"{url}\"";
+
+
+            string command =  $"{GetCookie(url)} {GetFormat()}--audio-format best --audio-quality 0 --no-playlist -o \"{tempfile}\" \"{url}\"";
 
             ProcessStartInfo info = new ProcessStartInfo();
             info.FileName = ytdlpPath;
@@ -427,7 +526,7 @@ namespace youtube2mp3
                 tempfile = item.FullName;
                 break;
             }
-            if (tempfile == null) return false;
+            if (tempfile == null) return null;
 
             //Convert audio file.
             string audioFile = Path.Combine(OutputFolder, "output-audio-192k.mp3");
@@ -463,13 +562,13 @@ namespace youtube2mp3
                 }
             }
 
-            if (!File.Exists(audioFile)) return false;
+            if (!File.Exists(audioFile)) return null;
 
 
             if (!DownloadVideoCB.Checked)
             {
                 File.Copy(tempfile, Path.Combine(OutputFolder, $"[原始文件]{new FileInfo(tempfile).Name}"));
-                return true;
+                return audioFile;
             }
 
             //Convert video file.
@@ -506,10 +605,19 @@ namespace youtube2mp3
                 }
             }
 
-            if (!File.Exists(videoFile)) return false;
+            if (!File.Exists(videoFile)) return null;
 
             File.Copy(tempfile, Path.Combine(OutputFolder, $"[原始文件]{new FileInfo(tempfile).Name}"));
-            return true;
+            return audioFile;
+        }
+
+        private string GetCookie(string url)
+        {
+            //return $"--cookies \"{CookiePath}\"";
+            if (url.Contains("youtube") || url.Contains("youtu.be")){
+                return $"--cookies \"{CookiePath}\"";
+            }
+            return string.Empty;
         }
 
         private object GetFormat() => DownloadVideoCB.Checked ? "" : "-f bestaudio --extract-audio ";

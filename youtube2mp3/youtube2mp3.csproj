@@ -82,6 +82,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -105,11 +106,23 @@
     <Compile Include="ClearForm.Designer.cs">
       <DependentUpon>ClearForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="InfoUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="InfoUserControl.Designer.cs">
+      <DependentUpon>InfoUserControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MusicInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MusicInfo.Designer.cs">
+      <DependentUpon>MusicInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -119,8 +132,14 @@
     <EmbeddedResource Include="ClearForm.resx">
       <DependentUpon>ClearForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="InfoUserControl.resx">
+      <DependentUpon>InfoUserControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MusicInfo.resx">
+      <DependentUpon>MusicInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -143,15 +162,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <None Include="Resource\spek.zip" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\ffmpeg.exe" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resource\yt-dlp.exe" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
@@ -162,6 +179,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resource\Newtonsoft.Json.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TimingAnlyz.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\bass.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\TimingAnlyz.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resource\bass.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
