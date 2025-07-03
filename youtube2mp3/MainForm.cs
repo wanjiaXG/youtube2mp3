@@ -82,9 +82,9 @@ namespace youtube2mp3
             {
                 File.WriteAllBytes(ffmpegPath, Resources.ffmpeg);
             }
-
-            DownloadYTDLP(ytdlpPath);
             LoadNewtonsoft();
+            DownloadYTDLP(ytdlpPath);
+            
             this.Invoke((MethodInvoker)(() =>
             {
                 DownloadBtn.Text = "开始下载";
