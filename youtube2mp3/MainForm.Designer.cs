@@ -47,7 +47,7 @@ namespace youtube2mp3
             this.CookieLB.Name = "CookieLB";
             this.CookieLB.Size = new System.Drawing.Size(307, 23);
             this.CookieLB.TabIndex = 0;
-            this.CookieLB.Text = "Cookie(目前仅下载youtube需要, 其他视频平台可留空)";
+            this.CookieLB.Text = "Cookie(可选, 若下载失败可填后再试)";
             this.CookieLB.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // CookieTB
@@ -132,7 +132,7 @@ namespace youtube2mp3
             this.DownloadVideoCB.Name = "DownloadVideoCB";
             this.DownloadVideoCB.Size = new System.Drawing.Size(87, 24);
             this.DownloadVideoCB.TabIndex = 8;
-            this.DownloadVideoCB.Text = "下载视频";
+            this.DownloadVideoCB.Text = "转换视频";
             this.DownloadVideoCB.UseVisualStyleBackColor = true;
             this.DownloadVideoCB.CheckedChanged += new System.EventHandler(this.AudioOnlyCB_CheckedChanged);
             // 
@@ -165,7 +165,7 @@ namespace youtube2mp3
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "从在线视频到屙屎编辑器[基于yt-dlp] by wanjia 2025-07-03 (支持youtube, bilibili, twitter)";
+            this.Text = "从在线视频到屙屎编辑器[基于yt-dlp] by wanjia 2026-02-05 (支持youtube, bilibili, twitter)";
             this.ResumeLayout(false);
             this.PerformLayout();
 

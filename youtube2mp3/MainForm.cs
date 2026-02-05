@@ -413,11 +413,11 @@ namespace youtube2mp3
                 }
             }*/
 
-            if ((url.Contains("youtu.be") || url.Contains("youtube.com")) && string.IsNullOrWhiteSpace(cookie))
-            {
-                MessageBox.Show("请输入cookie后再继续");
-                return -1;
-            }
+            //if ((url.Contains("youtu.be") || url.Contains("youtube.com")) && string.IsNullOrWhiteSpace(cookie))
+            //{
+            //    MessageBox.Show("请输入cookie后再继续");
+            //    return -1;
+            //}
 
             DisableControl();
             thread = new Thread(() =>
@@ -495,7 +495,8 @@ namespace youtube2mp3
             string tempfile = Path.Combine(RootFolder, "temp-file");
 
 
-            string command =  $"{GetCookie(url)} {GetFormat()}--audio-format best --audio-quality 0 --no-playlist -o \"{tempfile}\" \"{url}\"";
+            //string command =  $"{GetCookie(url)} {GetFormat()}--audio-format best --audio-quality 0 --no-playlist -o \"{tempfile}\" \"{url}\"";
+            string command = $"{GetCookie(url)} --no-playlist -o \"{tempfile}\" \"{url}\"";
 
             ProcessStartInfo info = new ProcessStartInfo();
             info.FileName = ytdlpPath;
@@ -620,8 +621,9 @@ namespace youtube2mp3
 
         private string GetCookie(string url)
         {
-            //return $"--cookies \"{CookiePath}\"";
-            if (url.Contains("youtube") || url.Contains("youtu.be")){
+            string cookie = File.ReadAllText(CookiePath);
+            if (!string.IsNullOrWhiteSpace(cookie))
+            {
                 return $"--cookies \"{CookiePath}\"";
             }
             return string.Empty;
